@@ -1,4 +1,3 @@
-// Performance analysis
 void performanceAnalysis()
 {
     if (count == 0)
@@ -32,8 +31,6 @@ void performanceAnalysis()
     }
 }
 
-
-// Identify academically at-risk students
 void identifyAtRiskStudents()
 {
     int found = 0;
@@ -61,8 +58,6 @@ void identifyAtRiskStudents()
     }
 }
 
-
-// AI-like performance prediction
 void aiPrediction()
 {
     if (count == 0)
