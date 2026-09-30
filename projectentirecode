@@ -1,0 +1,400 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define LIMIT 100
+typedef struct
+{
+    int id;
+    char fullName[50];
+    float score;
+    float attendance;
+} Student;
+
+typedef struct StudentNode
+{
+    Student info;
+    struct StudentNode *next;
+} StudentNode;
+
+Student records[LIMIT];
+StudentNode *start = NULL;
+int totalStudents = 0;
+void insertNode(Student s)
+{
+    StudentNode *p = malloc(sizeof(StudentNode));
+
+    if (p == NULL)
+    {
+        printf("\nMemory allocation failed.\n");
+        return;
+    }
+
+    p->info = s;
+    p->next = NULL;
+
+    if (start == NULL)
+    {
+        start = p;
+    }
+    else
+    {
+        StudentNode *q = start;
+
+        while (q->next != NULL)
+            q = q->next;
+
+        q->next = p;
+    }
+}
+int rollExists(int id)
+{
+    int i;
+
+    for (i = 0; i < totalStudents; i++)
+    {
+        if (records[i].id == id)
+            return 1;
+    }
+
+    return 0;
+}
+void addStudent()
+{
+    Student s;
+
+    if (totalStudents == LIMIT)
+    {
+        printf("\nMaximum student limit reached.\n");
+        return;
+    }
+
+    printf("\nEnter Roll Number: ");
+    scanf("%d", &s.id);
+
+    if (rollExists(s.id))
+    {
+        printf("This roll number is already registered.\n");
+        return;
+    }
+
+    printf("Enter Name: ");
+    scanf(" %[^\n]", s.fullName);
+
+    printf("Enter Marks: ");
+    scanf("%f", &s.score);
+
+    if (s.score < 0 || s.score > 100)
+    {
+        printf("Marks must be between 0 and 100.\n");
+        return;
+    }
+
+    printf("Enter Attendance Percentage: ");
+    scanf("%f", &s.attendance);
+
+    if (s.attendance < 0 || s.attendance > 100)
+    {
+        printf("Attendance must be between 0 and 100.\n");
+        return;
+    }
+
+    records[totalStudents] = s;
+    insertNode(s);
+    totalStudents++;
+
+    printf("\nStudent added successfully.\n");
+}
+
+/* Find a student */
+void findStudent()
+{
+    int id, i;
+
+    printf("\nEnter Roll Number: ");
+    scanf("%d", &id);
+
+    for (i = 0; i < totalStudents; i++)
+    {
+        if (records[i].id == id)
+        {
+            printf("\n----- STUDENT DETAILS -----\n");
+            printf("Roll Number : %d\n", records[i].id);
+            printf("Name        : %s\n", records[i].fullName);
+            printf("Marks       : %.2f\n", records[i].score);
+            printf("Attendance  : %.2f%%\n",
+                   records[i].attendance);
+            return;
+        }
+    }
+
+    printf("\nNo student found with roll number %d.\n", id);
+}
+
+/* Display every student */
+void showStudents()
+{
+    int i;
+
+    if (totalStudents == 0)
+    {
+        printf("\nNo records available.\n");
+        return;
+    }
+
+    printf("\n===== STUDENT RECORDS ====\n");
+    printf("%-10s %-20s %-10s %-12s\n",
+           "Roll No", "Name", "Marks", "Attendance");
+
+    for (i = 0; i < totalStudents; i++)
+    {
+        printf("%-10d %-20s %-10.2f %-12.2f%%\n",
+               records[i].id,
+               records[i].fullName,
+               records[i].score,
+               records[i].attendance);
+    }
+}
+void arrangeByMarks()
+{
+    int i, j;
+    Student temp;
+
+    if (totalStudents == 0)
+    {
+        printf("\nNo records available.\n");
+        return;
+    }
+
+    for (i = 0; i < totalStudents - 1; i++)
+    {
+        for (j = i + 1; j < totalStudents; j++)
+        {
+            if (records[i].score < records[j].score)
+            {
+                temp = records[i];
+                records[i] = records[j];
+                records[j] = temp;
+            }
+        }
+    }
+
+    printf("\nRecords arranged according to marks.\n");
+}
+
+/* Show class ranking */
+void showRanking()
+{
+    int i;
+
+    if (totalStudents == 0)
+    {
+        printf("\nNo records available.\n");
+        return;
+    }
+
+    arrangeByMarks();
+
+    printf("\n========== CLASS RANKING ==========\n");
+
+    for (i = 0; i < totalStudents; i++)
+    {
+        printf("%d. %-20s %.2f marks\n",
+               i + 1,
+               records[i].fullName,
+               records[i].score);
+    }
+}
+void evaluatePerformance()
+{
+    int i;
+
+    if (totalStudents == 0)
+    {
+        printf("\nNo records available.\n");
+        return;
+    }
+
+    printf("\n========== PERFORMANCE REPORT ==========\n");
+
+    for (i = 0; i < totalStudents; i++)
+    {
+        printf("\n%s\n", records[i].fullName);
+
+        if (records[i].score >= 75)
+            printf("Level : Excellent\n");
+        else if (records[i].score >= 60)
+            printf("Level : Good\n");
+        else if (records[i].score >= 40)
+            printf("Level : Average\n");
+        else
+            printf("Level : Needs Improvement\n");
+    }
+}
+
+/* Find students requiring attention */
+void showRiskStudents()
+{
+    int i, found = 0;
+
+    if (totalStudents == 0)
+    {
+        printf("\nNo records available.\n");
+        return;
+    }
+for (i = 0; i < totalStudents; i++)
+    {
+        if (records[i].score < 40 ||
+            records[i].attendance < 75)
+        {
+            printf("\nName       : %s\n", records[i].fullName);
+            printf("Roll No    : %d\n", records[i].id);
+            printf("Marks      : %.2f\n", records[i].score);
+            printf("Attendance : %.2f%%\n",
+                   records[i].attendance);
+
+            found = 1;
+        }
+    }
+
+    if (!found)
+        printf("No students require immediate attention.\n");
+}
+
+/* Calculate a combined prediction value */
+void predictPerformance()
+{
+    int i;
+    float prediction;
+
+    if (totalStudents == 0)
+    {
+        printf("\nNo records available.\n");
+        return;
+    }
+
+    printf("\n========== PERFORMANCE PREDICTION ==========\n");
+
+    for (i = 0; i < totalStudents; i++)
+    {
+        prediction =
+            (records[i].score * 0.60f) +
+            (records[i].attendance * 0.40f);
+
+        printf("\nStudent : %s\n", records[i].fullName);
+        printf("Prediction Score : %.2f\n", prediction);
+
+        if (prediction >= 75)
+            printf("Risk Level : Low\n");
+        else if (prediction >= 50)
+            printf("Risk Level : Moderate\n");
+        else
+            printf("Risk Level : High\n");
+    }
+}
+
+/* Store records in a text file */
+void exportRecords()
+{
+    FILE *file;
+    int i;
+
+    file = fopen("student_records.txt", "w");
+
+    if (file == NULL)
+    {
+        printf("\nUnable to create the file.\n");
+        return;
+    }
+
+    for (i = 0; i < totalStudents; i++)
+    {
+        fprintf(file, "%d %s %.2f %.2f\n",
+                records[i].id,
+                records[i].fullName,
+                records[i].score,
+                records[i].attendance);
+    }
+
+    fclose(file);
+
+    printf("\nRecords successfully saved to student_records.txt\n");
+}
+
+/* Display the application menu */
+void menu()
+{
+    printf(" INTELLIGENT STUDENT RECORD & PERFORMANCE SYSTEM\n");
+    printf("1. Add Student\n");
+    printf("2. Find Student\n");
+    printf("3. View All Students\n");
+    printf("4. Arrange by Marks\n");
+    printf("5. View Class Ranking\n");
+    printf("6. Performance Analysis\n");
+    printf("7. Identify At-Risk Students\n");
+    printf("8. Performance Prediction\n");
+    printf("9. Save Records\n");
+    printf("10. Exit\n");
+    
+}
+
+/* Main program */
+int main()
+{
+    int option;
+
+    do
+    {
+        menu();
+
+        printf("Enter your choice: ");
+        scanf("%d", &option);
+
+        switch (option)
+        {
+            case 1:
+                addStudent();
+                break;
+
+            case 2:
+                findStudent();
+                break;
+
+            case 3:
+                showStudents();
+                break;
+
+            case 4:
+                arrangeByMarks();
+                break;
+
+            case 5:
+                showRanking();
+                break;
+
+            case 6:
+                evaluatePerformance();
+                break;
+
+            case 7:
+                showRiskStudents();
+                break;
+
+            case 8:
+                predictPerformance();
+                break;
+
+            case 9:
+                exportRecords();
+                break;
+
+            case 10:
+                printf("\nProgram terminated successfully.\n");
+                break;
+
+            default:
+                printf("\nInvalid option. Please try again.\n");
+        }
+
+    } while (option != 10);
+
+    return 0;
+}
