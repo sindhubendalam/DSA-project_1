@@ -35,12 +35,12 @@ void addToLinkedList(struct Student s)
     }
     else
     {
-        struct Node *temp = head;
-        while (temp->link != NULL)
+        struct Node *p = head;
+        while (p->link != NULL)
         {
-            temp = temp->link;
+            p = p->link;
         }
-        temp->link = newNode;
+        p->link = newNode;
     }
 }
 
